@@ -127,7 +127,7 @@ class PublishLogin extends Command
      */
     protected function addValueToEnv($key, $value)
     {
-        File::append(base_path('.env'), "#ACACHA FORGE");
+        File::append(base_path('.env'), "\n#ACACHA FORGE\n");
         File::append(base_path('.env'), "$key=$value");
     }
 
