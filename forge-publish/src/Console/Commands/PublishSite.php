@@ -2,35 +2,34 @@
 
 namespace Acacha\ForgePublish\Commands;
 
-use Acacha\ForgePublish\Commands\Traits\InteractsWithEnvironment;
 use Acacha\ForgePublish\Commands\Traits\ShowsErrorResponse;
-use Acacha\ForgePublish\Commands\Traits\SkipsIfEnvVariableIsAlreadyInstalled;
+use Acacha\ForgePublish\Commands\Traits\SkipsIfEnvVariableIsnotInstalled;
 use Acacha\ForgePublish\Commands\Traits\SkipsIfNoEnvFileExists;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 
 /**
- * Class PublishLogin.
+ * Class PublishSite.
  *
  * @package Acacha\ForgePublish\Commands
  */
-class PublishLogin extends Command
+class PublishSite extends Command
 {
-    use ShowsErrorResponse, SkipsIfNoEnvFileExists, SkipsIfEnvVariableIsAlreadyInstalled, InteractsWithEnvironment;
+    use ShowsErrorResponse, SkipsIfNoEnvFileExists, SkipsIfEnvVariableIsnotInstalled;
 
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'publish:login {email?}';
+    protected $signature = 'publish:site';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Login to acacha forge';
+    protected $description = 'Create site on forge for the current user';
 
     /**
      * Guzzle Http client
@@ -40,14 +39,14 @@ class PublishLogin extends Command
     protected $http;
 
     /**
-     * Endpoint api url.
+     * API endpoint URL
      *
      * @var String
      */
     protected $url;
 
     /**
-     * PublishLogin constructor.
+     * PublishSite constructor.
      *
      * @param Client $client
      */
@@ -60,12 +59,13 @@ class PublishLogin extends Command
     /**
      * Execute the console command.
      *
+     * @return mixed
      */
     public function handle()
     {
         $this->checkIfCommandHaveToBeSkipped();
 
-        $email = $this->argument('email') ? $this->argument('email') : $this->ask('What is your email(username)?');
+        $email = $this->ask('What is your email(username)?');
         $password = $this->secret('What is the password?');
 
         $this->url = config('forge-publish.url') . config('forge-publish.token_uri');
@@ -79,17 +79,24 @@ class PublishLogin extends Command
                     'username' => $email,
                     'password' => $password,
                     'scope' => '*',
+                ],
+                'headers' => [
+                    'X-Requested-With' => 'XMLHttpRequest',
+                    'Authorization' => 'Bearer ' . env('ACACHA_FORGE_ACCESS_TOKEN')
                 ]
             ]);
         } catch (\Exception $e) {
             $this->showErrorAndDie($e);
+
         }
+
+        dd(json_decode( (string) $response->getBody()));
 
         $access_token = json_decode( (string) $response->getBody())->access_token ;
 
-        $this->addValueToEnv('ACACHA_FORGE_ACCESS_TOKEN', $access_token);
+//        $this->addValueToEnv('ACACHA_FORGE_ACCESS_TOKEN', $access_token);
 
-        $this->info('The access token has been added to file .env with key ACACHA_FORGE_ACCESS_TOKEN');
+        $this->info('The site has been added to Forge');
     }
 
     /**
@@ -98,7 +105,7 @@ class PublishLogin extends Command
     protected function checkIfCommandHaveToBeSkipped()
     {
         $this->skipIfNoEnvFileIsFound();
-        $this->skipIfEnvVarIsAlreadyInstalled('ACACHA_FORGE_ACCESS_TOKEN');
+        $this->skipIfEnvVarIsNotInstalled('ACACHA_FORGE_ACCESS_TOKEN');
     }
 
 }

@@ -15,7 +15,7 @@ return [
     | You could also see this value in field id of table oauth_clients
     | is the key with name Laravel Password Grant client
     |
-    | This value could be overwwriten using ACACHA_FORGE_CLIENT_ID env variable
+    | This value could be overwritted using ACACHA_FORGE_CLIENT_ID env variable
     | if you kwnow what you are doing.
     */
 
@@ -34,11 +34,11 @@ return [
     | You could also see this value in field id of table oauth_clients
     | is the key with name Laravel Password Grant client
     |
-    | This value could be overwwriten using ACACHA_FORGE_CLIENT_SECRET env variable
+    | This value could be overwritted using ACACHA_FORGE_CLIENT_SECRET env variable
     | if you kwnow what you are doing.
     */
 
-    'client_secret' => env('ACACHA_FORGE_CLIENT_SECRET', '8usvRPF3DIqM7PnlH9YCyy9e1xbKbttPbesrch0F'),
+    'client_secret' => env('ACACHA_FORGE_CLIENT_SECRET', 'bErvzwH2FWr3QfnCI5miGsNmQ8pp5gn9AUjJvZS8'),
 
 
    /*
@@ -48,7 +48,7 @@ return [
    |
    | Acacha Forge URL: http://forge.acacha.com
    |
-   | This value could be overwwriten using ACACHA_FORGE_URL env variable
+   | This value could be overwritted using ACACHA_FORGE_URL env variable
    | if you kwnow what you are doing.
    */
 
@@ -61,10 +61,49 @@ return [
    |
    | Acacha Forge ACCESS TOKEN URI: /oauth/token
    |
-   | This value could be overwwriten using ACACHA_FORGE_ACCESS_TOKEN_URI env variable
+   | This value could be overwritted using ACACHA_FORGE_ACCESS_TOKEN_URI env variable
    | if you kwnow what you are doing.
    */
 
     'token_uri' => env('ACACHA_FORGE_ACCESS_TOKEN_URI', '/oauth/token'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | ACACHA FORGE PROJECT TYPE. Default: php
+  |--------------------------------------------------------------------------
+  |
+  | Acacha Forge Site project type: php
+  |
+  | This value could be overwritted using ACACHA_FORGE_PROJECT_TYPE env variable
+  | if you kwnow what you are doing.
+  */
+
+  'project_type' => env('ACACHA_FORGE_PROJECT_TYPE', 'php'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | ACACHA FORGE SITE DIRECTORY. Default: /public
+  |--------------------------------------------------------------------------
+  |
+  | Acacha Forge Site directory: /public
+  |
+  | This value could be overwritted using ACACHA_FORGE_SITE_DIRECTORY env variable
+  | if you kwnow what you are doing.
+  */
+
+  'site_directory' => env('ACACHA_FORGE_SITE_DIRECTORY', '/public'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | ACACHA FORGE USER SERVERS URI ENDPOINT. Default: /user/servers
+  |--------------------------------------------------------------------------
+  |
+  | Acacha Forge user servers URI endpoint: /user/servers
+  |
+  | This value could be overwriten using ACACHA_FORGE_USER_SERVERS_URI env variable
+  | if you kwnow what you are doing.
+  */
+
+  'user_servers_uri' => env('ACACHA_FORGE_USER_SERVERS_URI', '/api/v1/user/servers'),
 
 ];
