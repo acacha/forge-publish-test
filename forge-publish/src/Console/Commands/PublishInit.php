@@ -117,6 +117,17 @@ class PublishInit extends Command
             $this->info("Ok! I see you already have a domain configured so let's go on!...");
         }
 
+        $sites = $already_logged ? $this->fetchSites() : $this->fetchSites($this->getTokenFromEnvFile());
+
+        $site_id = null;
+
+        if ( env('ACACHA_FORGE_SITE', null) == null) {
+            $domain = $this->ask('Domain in production?');
+        } else {
+            $site_id = env('ACACHA_FORGE_SITE');
+            $this->info("Ok! I see you already have a site configured so let's go on!...");
+        }
+
         $this->info('');
         $this->info('Ok! let me resume: ');
 
@@ -129,7 +140,8 @@ class PublishInit extends Command
           [ 'Server permissions requested at http:://forge.acacha.com?', 'Yes'],
           [ 'Server name', $server_name],
           [ 'Server Forge id', $forge_id_server],
-          [ 'domain', $domain],
+          [ 'Domain', $domain],
+          [ 'Server site id', $site_id]
         ];
 
         $this->table($headers, $tasks);
@@ -193,6 +205,27 @@ class PublishInit extends Command
     }
 
     /**
+     * Fetch sites
+     */
+    protected function fetchSites ($token = null)
+    {
+        if (!$token) $token = env('ACACHA_FORGE_ACCESS_TOKEN');
+        $url = config('forge-publish.url') . config('forge-publish.user_sites_uri');
+        try {
+            $response = $this->http->get($url,[
+                'headers' => [
+                    'X-Requested-With' => 'XMLHttpRequest',
+                    'Authorization' => 'Bearer ' . $token
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return [];
+        }
+        return json_decode((string) $response->getBody());
+    }
+
+
+    /**
      * Get forge id server from server name.
      *
      * @param $servers
@@ -210,7 +243,7 @@ class PublishInit extends Command
      * Get forge name from forge id.
      *
      * @param $servers
-     * @param $server_name
+     * @param $server_id
      * @return mixed
      */
     protected function getForgeName($servers, $server_id)

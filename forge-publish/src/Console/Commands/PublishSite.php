@@ -2,110 +2,54 @@
 
 namespace Acacha\ForgePublish\Commands;
 
-use Acacha\ForgePublish\Commands\Traits\ShowsErrorResponse;
-use Acacha\ForgePublish\Commands\Traits\SkipsIfEnvVariableIsnotInstalled;
-use Acacha\ForgePublish\Commands\Traits\SkipsIfNoEnvFileExists;
-use GuzzleHttp\Client;
-use Illuminate\Console\Command;
-
 /**
  * Class PublishSite.
  *
  * @package Acacha\ForgePublish\Commands
  */
-class PublishSite extends Command
+class PublishSite extends SaveEnvVariable
 {
-    use ShowsErrorResponse, SkipsIfNoEnvFileExists, SkipsIfEnvVariableIsnotInstalled;
-
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'publish:site';
+    protected $signature = 'publish:site {site?}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create site on forge for the current user';
+    protected $description = 'Save acacha forge site';
 
     /**
-     * Guzzle Http client
-     *
-     * @var Client
-     */
-    protected $http;
-
-    /**
-     * API endpoint URL
-     *
-     * @var String
-     */
-    protected $url;
-
-    /**
-     * PublishSite constructor.
-     *
-     * @param Client $client
-     */
-    public function __construct(Client $client)
-    {
-        parent::__construct();
-        $this->http = $client;
-    }
-
-    /**
-     * Execute the console command.
+     * Env var to set.
      *
      * @return mixed
      */
-    public function handle()
+    protected function envVar()
     {
-        $this->checkIfCommandHaveToBeSkipped();
-
-        $email = $this->ask('What is your email(username)?');
-        $password = $this->secret('What is the password?');
-
-        $this->url = config('forge-publish.url') . config('forge-publish.token_uri');
-        $response = '';
-        try {
-            $response = $this->http->post($this->url, [
-                'form_params' => [
-                    'client_id' => config('forge-publish.client_id'),
-                    'client_secret' => config('forge-publish.client_secret'),
-                    'grant_type' => 'password',
-                    'username' => $email,
-                    'password' => $password,
-                    'scope' => '*',
-                ],
-                'headers' => [
-                    'X-Requested-With' => 'XMLHttpRequest',
-                    'Authorization' => 'Bearer ' . env('ACACHA_FORGE_ACCESS_TOKEN')
-                ]
-            ]);
-        } catch (\Exception $e) {
-            $this->showErrorAndDie($e);
-
-        }
-
-        dd(json_decode( (string) $response->getBody()));
-
-        $access_token = json_decode( (string) $response->getBody())->access_token ;
-
-//        $this->addValueToEnv('ACACHA_FORGE_ACCESS_TOKEN', $access_token);
-
-        $this->info('The site has been added to Forge');
+        return 'ACACHA_FORGE_SITE';
     }
 
     /**
-     * Check if command have to be skipped.
+     * Argument key.
+     *
+     * @return mixed
      */
-    protected function checkIfCommandHaveToBeSkipped()
+    protected function argKey()
     {
-        $this->skipIfNoEnvFileIsFound();
-        $this->skipIfEnvVarIsNotInstalled('ACACHA_FORGE_ACCESS_TOKEN');
+        return 'site';
     }
 
+    /**
+     * Question text.
+     *
+     * @return mixed
+     */
+    protected function questionText()
+    {
+        return 'Acacha forge site id?';
+    }
 }

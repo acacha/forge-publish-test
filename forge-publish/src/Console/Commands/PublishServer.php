@@ -51,7 +51,7 @@ class PublishServer extends SaveEnvVariable
      */
     protected function questionText()
     {
-        return 'Acacha forge server?';
+        return 'Acacha forge server (forge id)?';
     }
 
 }

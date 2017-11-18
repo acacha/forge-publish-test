@@ -95,15 +95,28 @@ return [
 
   /*
   |--------------------------------------------------------------------------
-  | ACACHA FORGE USER SERVERS URI ENDPOINT. Default: /user/servers
+  | ACACHA FORGE USER SERVERS URI ENDPOINT. Default: /api/v1/user/servers
   |--------------------------------------------------------------------------
   |
-  | Acacha Forge user servers URI endpoint: /user/servers
+  | Acacha Forge user servers URI endpoint: /api/v1/user/servers
   |
   | This value could be overwriten using ACACHA_FORGE_USER_SERVERS_URI env variable
   | if you kwnow what you are doing.
   */
 
   'user_servers_uri' => env('ACACHA_FORGE_USER_SERVERS_URI', '/api/v1/user/servers'),
+
+  /*
+  |--------------------------------------------------------------------------
+  | ACACHA FORGE USER SITES URI ENDPOINT. Default: /api/v1//user/servers
+  |--------------------------------------------------------------------------
+  |
+  | Acacha Forge user servers URI endpoint: /api/v1//user/servers
+  |
+  | This value could be overwriten using ACACHA_FORGE_USER_SITES_URI env variable
+  | if you kwnow what you are doing.
+  */
+
+  'user_sites_uri' => env('ACACHA_FORGE_USER_SITES_URI', '/api/v1/user/sites'),
 
 ];
