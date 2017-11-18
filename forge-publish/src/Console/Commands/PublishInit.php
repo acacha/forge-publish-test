@@ -4,6 +4,7 @@ namespace Acacha\ForgePublish\Commands;
 
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
+use josegonzalez\Dotenv\Loader;
 
 /**
  * Class PublishInit.
@@ -50,8 +51,12 @@ class PublishInit extends Command
     public function handle()
     {
         $this->info('Hello! We are going to config Acacha Laravel Forge publish together...');
+        $this->info('');
         $this->info('Let me check you have been followed all the previous requirements...');
 
+        $this->info('');
+        $this->info('Visit http:://forge.acacha.com');
+        $this->info('');
         $this->error('Please use Github Social Login for login!!!');
 
         while (! $this->confirm('User created at http:://forge.acacha.com?')) {}
@@ -61,8 +66,10 @@ class PublishInit extends Command
             $email = $this->anticipate('Ok! User email?', $emails);
         } else {
             $email = env('ACACHA_FORGE_EMAIL');
-            $this->info("Ok I see you already have a Forge user email configured so let's go on!...");
+            $this->info("Ok! I see you already have a Forge user email configured so let's go on!...");
         }
+
+        $already_logged = false;
 
         if ( env('ACACHA_FORGE_ACCESS_TOKEN', null) == null) {
             $this->info('I need permissions to operate in Acacha Forge in your name...');
@@ -81,10 +88,11 @@ class PublishInit extends Command
                 $this->call('publish:token');
             }
         } else {
-            $this->info("Ok I see you already have a token for accessing Acacha Laravel Forge so let's go on!...");
+            $this->info("Ok! I see you already have a token for accessing Acacha Laravel Forge so let's go on!...");
+            $already_logged = true;
         }
 
-        $servers = $this->fetchServers();
+        $servers = $already_logged ? $this->fetchServers() : $this->fetchServers($this->getTokenFromEnvFile());
 
         if ( env('ACACHA_FORGE_SERVER', null) == null) {
 
@@ -99,17 +107,18 @@ class PublishInit extends Command
         } else {
             $forge_id_server = env('ACACHA_FORGE_SERVER');
             $server_name = $this->getForgeName($servers, $forge_id_server);
-            $this->info("Ok I see you already have a Forge server configured so let's go on!...");
+            $this->info("Ok! I see you already have a Forge server configured so let's go on!...");
         }
 
         if ( env('ACACHA_FORGE_DOMAIN', null) == null) {
             $domain = $this->ask('Domain in production?');
         } else {
             $domain = env('ACACHA_FORGE_DOMAIN');
-            $this->info("Ok I see you already have a domain configured so let's go on!...");
+            $this->info("Ok! I see you already have a domain configured so let's go on!...");
         }
 
-        $this->info('Ok let me resume: ');
+        $this->info('');
+        $this->info('Ok! let me resume: ');
 
         $headers = ['Task/Config name', 'Done/result?'];
 
@@ -125,17 +134,28 @@ class PublishInit extends Command
 
         $this->table($headers, $tasks);
 
-        $this->call('publish:email', [
-            'email' => $email
-        ]);
-        $this->call('publish:server', [
-            'server' => $forge_id_server
-        ]);
-        $this->call('publish:domain', [
-            'domain' => $domain
-        ]);
+        $this->info('');
+        if ( env('ACACHA_FORGE_EMAIL', null) == null) {
+            $this->call('publish:email', [
+                'email' => $email
+            ]);
+        }
+        if ( env('ACACHA_FORGE_SERVER', null) == null) {
+            $this->call('publish:server', [
+                'server' => $forge_id_server
+            ]);
+        }
+        if ( env('ACACHA_FORGE_DOMAIN', null) == null) {
 
+            $this->call('publish:domain', [
+                'domain' => $domain
+            ]);
+        }
+
+        $this->info('');
         $this->info('Perfect! All info is saved to your environment. Enjoy Acacha forge publish!');
+        $this->info('');
+        $this->error('Remember to rerun your server to apply changes in .env file!!!');
     }
 
     /**
@@ -155,23 +175,19 @@ class PublishInit extends Command
     /**
      * Fetch servers
      */
-    protected function fetchServers ()
+    protected function fetchServers ($token = null)
     {
-        $response = '';
-
+        if (!$token) $token = env('ACACHA_FORGE_ACCESS_TOKEN');
         $url = config('forge-publish.url') . config('forge-publish.user_servers_uri');
         try {
             $response = $this->http->get($url,[
                 'headers' => [
                     'X-Requested-With' => 'XMLHttpRequest',
-                    'Authorization' => 'Bearer ' . env('ACACHA_FORGE_ACCESS_TOKEN')
+                    'Authorization' => 'Bearer ' . $token
                 ]
             ]);
         } catch (\Exception $e) {
-            $this->error('And error occurs connecting to the api url: ' . $url);
-            $this->error('Status code: ' . $e->getResponse()->getStatusCode() . ' | Reason : ' . $e->getResponse()->getReasonPhrase() );
-            $this->error('No servers found! No servers assigned to your user in Acacha Laravel Forge!');
-            die();
+            return [];
         }
         return json_decode((string) $response->getBody());
     }
@@ -200,8 +216,21 @@ class PublishInit extends Command
     protected function getForgeName($servers, $server_id)
     {
         return collect($servers)->filter(function ($server) use ($server_id) {
-            return $server->id === $server_id;
+            return $server->forge_id === $server_id;
         })->first()->name;
+    }
+
+    /**
+     * Get token from env file
+     *
+     * @return mixed
+     */
+    protected function getTokenFromEnvFile()
+    {
+        //NOTE: We cannot use env() helper because the .env file has been changes in this request !!!
+        return (new Loader(base_path('.env')))
+            ->parse()
+            ->toArray()['ACACHA_FORGE_ACCESS_TOKEN'];
     }
 
 }
