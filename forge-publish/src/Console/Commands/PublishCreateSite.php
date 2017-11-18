@@ -2,6 +2,7 @@
 
 namespace Acacha\ForgePublish\Commands;
 
+use Acacha\ForgePublish\Commands\Traits\ItFetchesServers;
 use Acacha\ForgePublish\Commands\Traits\ShowsErrorResponse;
 use Acacha\ForgePublish\Commands\Traits\SkipsIfEnvVariableIsnotInstalled;
 use Acacha\ForgePublish\Commands\Traits\SkipsIfNoEnvFileExists;
@@ -15,14 +16,14 @@ use Illuminate\Console\Command;
  */
 class PublishCreateSite extends Command
 {
-    use ShowsErrorResponse, SkipsIfNoEnvFileExists, SkipsIfEnvVariableIsnotInstalled;
+    use ShowsErrorResponse, SkipsIfNoEnvFileExists, SkipsIfEnvVariableIsnotInstalled, ItFetchesServers;
 
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'publish:create_site';
+    protected $signature = 'publish:create_site {forge_server?} {domain?} {project_type?} {site_directory?} {--token=}\'';
 
     /**
      * The console command description.
@@ -59,42 +60,49 @@ class PublishCreateSite extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
      */
     public function handle()
     {
         $this->checkIfCommandHaveToBeSkipped();
 
-        $email = $this->ask('What is your email(username)?');
-        $password = $this->secret('What is the password?');
+        $servers = $this->option('token') ? $this->fetchServers($this->option('token')) : $this->fetchServers();
+        $server_names = collect($servers)->pluck('name')->toArray();
 
-        $this->url = config('forge-publish.url') . config('forge-publish.token_uri');
-        $response = '';
+        if ($this->argument('forge_server')) {
+            $forge_server = $this->argument('forge_server');
+        } else {
+            $server_name = $this->choice('Forge server?', $server_names, 0);
+            $forge_server = $this->getForgeIdServer($servers,$server_name);
+        }
+
+        $domain = $this->argument('domain') ? $this->argument('domain') : $this->ask('Domain?');
+        $project_type = $this->argument('project_type') ?
+                    $this->argument('project_type') :
+                    $this->ask('Project Type?', config('forge-publish.project_type'));
+        $site_directory = $this->argument('site_directory') ?
+            $this->argument('site_directory') :
+            $this->ask('Directory?', config('forge-publish.site_directory'));
+
+        $uri = str_replace('{forgeserver}', $forge_server , config('forge-publish.post_sites_uri'));
+        $this->url = config('forge-publish.url') . $uri;
+
+        $token = $this->option('token') ? $this->option('token'): env('ACACHA_FORGE_ACCESS_TOKEN');
+
         try {
-            $response = $this->http->post($this->url, [
+            $this->http->post($this->url, [
                 'form_params' => [
-                    'client_id' => config('forge-publish.client_id'),
-                    'client_secret' => config('forge-publish.client_secret'),
-                    'grant_type' => 'password',
-                    'username' => $email,
-                    'password' => $password,
-                    'scope' => '*',
+                    'domain' => $domain,
+                    'project_type' => $project_type,
+                    'directory' => $site_directory
                 ],
                 'headers' => [
                     'X-Requested-With' => 'XMLHttpRequest',
-                    'Authorization' => 'Bearer ' . env('ACACHA_FORGE_ACCESS_TOKEN')
+                    'Authorization' => 'Bearer ' . $token
                 ]
             ]);
         } catch (\Exception $e) {
             $this->showErrorAndDie($e);
-
         }
-
-        dd(json_decode( (string) $response->getBody()));
-
-        $access_token = json_decode( (string) $response->getBody())->access_token ;
-
-//        $this->addValueToEnv('ACACHA_FORGE_ACCESS_TOKEN', $access_token);
 
         $this->info('The site has been added to Forge');
     }
@@ -105,7 +113,7 @@ class PublishCreateSite extends Command
     protected function checkIfCommandHaveToBeSkipped()
     {
         $this->skipIfNoEnvFileIsFound();
-        $this->skipIfEnvVarIsNotInstalled('ACACHA_FORGE_ACCESS_TOKEN');
+        if ( ! $this->option('token')) $this->skipIfEnvVarIsNotInstalled('ACACHA_FORGE_ACCESS_TOKEN');
     }
 
 }

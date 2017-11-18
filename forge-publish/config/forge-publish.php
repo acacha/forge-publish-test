@@ -119,4 +119,17 @@ return [
 
   'user_sites_uri' => env('ACACHA_FORGE_USER_SITES_URI', '/api/v1/user/sites'),
 
+  /*
+  |--------------------------------------------------------------------------
+  | ACACHA FORGE POST SITES URI ENDPOINT. Default: /api/v1/servers/{forgeserver}/sites
+  |--------------------------------------------------------------------------
+  |
+  | Acacha Forge post site URI endpoint: /api/v1/servers/{forgeserver}/sites
+  |
+  | This value could be overwriten using ACACHA_FORGE_POST_SITES_URI env variable
+  | if you kwnow what you are doing.
+  */
+
+    'post_sites_uri' => env('ACACHA_FORGE_POST_SITES_URI', '/api/v1/servers/{forgeserver}/sites'),
+
 ];

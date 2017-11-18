@@ -65,8 +65,8 @@ class PublishLogin extends Command
     {
         $this->checkIfCommandHaveToBeSkipped();
 
-        $email = $this->argument('email') ? $this->argument('email') : $this->ask('What is your email(username)?');
-        $password = $this->secret('What is the password?');
+        $email = $this->argument('email') ? $this->argument('email') : $this->ask('Email?');
+        $password = $this->secret('Password?');
 
         $this->url = config('forge-publish.url') . config('forge-publish.token_uri');
         $response = '';
