@@ -4,6 +4,7 @@ namespace Acacha\ForgePublish\Commands;
 
 use Acacha\ForgePublish\Commands\Traits\ItFetchesServers;
 use Acacha\ForgePublish\Commands\Traits\PossibleEmails;
+use Acacha\ForgePublish\ForgePublishRCFile;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
 use josegonzalez\Dotenv\Loader;
@@ -54,12 +55,14 @@ class PublishInit extends Command
      */
     public function handle()
     {
-        $this->info('Hello! We are going to config Acacha Laravel Forge publish together...');
+        $this->info('Hello! Together we are going to config Acacha Laravel Forge publish ...');
         $this->info('');
-        $this->info('Let me check you have been followed all the previous requirements...');
+        $this->info('Let me check the requirements...');
+
+        if (! ForgePublishRCFile::exists()) $this->executePublishRc();
 
         $this->info('');
-        $this->info('Visit http:://forge.acacha.com');
+        $this->info('Please visit and login on http:://forge.acacha.com.');
         $this->info('');
         $this->error('Please use Github Social Login for login!!!');
 
@@ -137,6 +140,8 @@ class PublishInit extends Command
 
         $headers = ['Task/Config name', 'Done/result?'];
 
+        $ip_address = $this->serverIpAddress($servers,$server_id);
+
         $tasks = [
           [ 'User created at http:://forge.acacha.com?', 'Yes'],
           [ 'Email', $email],
@@ -145,7 +150,8 @@ class PublishInit extends Command
           [ 'Server name', $server_name],
           [ 'Server Forge id', $forge_id_server],
           [ 'Domain', $domain],
-          [ 'Server site id', $site_id ? $site_id : 'Site not created yet' ]
+          [ 'Server site id', $site_id ? $site_id : 'Site not created yet' ],
+          [ 'Server IP address', $ip_address ]
         ];
 
         $this->table($headers, $tasks);
@@ -171,6 +177,12 @@ class PublishInit extends Command
         if ( env('ACACHA_FORGE_SITE', null) == null && $site_id) {
             $this->call('publish:site', [
                 'site' => $site_id
+            ]);
+        }
+
+        if ( env('ACACHA_FORGE_IP_ADDRESS', null) == null) {
+            $this->call('publish:ip', [
+                'ip_address' => $ip_address
             ]);
         }
 
@@ -222,10 +234,22 @@ class PublishInit extends Command
         $this->call('publish:ssh', [
             'email' => $email,
             'server_name' => $server_id,
-            'ip' => $this->serverIpAddress($servers,$server_id)
+            'ip' => $ip_address
         ]);
 
         $this->info("DONE!!!!!!!!!!!");
+    }
+
+    /**
+     * Execute publish:rc command
+     */
+    protected function executePublishRc()
+    {
+        $this->call('publish:rc', [
+            'email' => $email,
+            'server_name' => $server_id,
+            'ip' => $ip_address
+        ]);
     }
 
     /**

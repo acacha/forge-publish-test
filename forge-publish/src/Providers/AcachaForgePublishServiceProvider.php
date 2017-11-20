@@ -7,8 +7,10 @@ use Acacha\ForgePublish\Commands\PublishDomain;
 use Acacha\ForgePublish\Commands\PublishEmail;
 use Acacha\ForgePublish\Commands\PublishInfo;
 use Acacha\ForgePublish\Commands\PublishInit;
+use Acacha\ForgePublish\Commands\PublishIp;
 use Acacha\ForgePublish\Commands\PublishLogin;
 use Acacha\ForgePublish\Commands\PublishPush;
+use Acacha\ForgePublish\Commands\PublishRc;
 use Acacha\ForgePublish\Commands\PublishServer;
 use Acacha\ForgePublish\Commands\PublishSite;
 use Acacha\ForgePublish\Commands\PublishSsh;
@@ -45,11 +47,13 @@ class AcachaForgePublishServiceProvider extends ServiceProvider
                 PublishToken::class,
                 PublishEmail::class,
                 PublishDomain::class,
+                PublishIp::class,
                 PublishServer::class,
                 PublishSite::class,
                 PublishInfo::class,
                 PublishCreateSite::class,
                 PublishSsh::class,
+                PublishRc::class,
             ]);
         }
         
