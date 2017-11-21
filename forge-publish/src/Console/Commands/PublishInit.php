@@ -2,6 +2,7 @@
 
 namespace Acacha\ForgePublish\Commands;
 
+use Acacha\ForgePublish\Commands\Traits\ChecksForRootPermission;
 use Acacha\ForgePublish\Commands\Traits\ItFetchesServers;
 use Acacha\ForgePublish\Commands\Traits\PossibleEmails;
 use Acacha\ForgePublish\ForgePublishRCFile;
@@ -17,7 +18,7 @@ use josegonzalez\Dotenv\Loader;
  */
 class PublishInit extends Command
 {
-    use ItFetchesServers, PossibleEmails;
+    use ItFetchesServers, PossibleEmails, ChecksForRootPermission;
 
     /**
      * The name and signature of the console command.
@@ -64,6 +65,7 @@ class PublishInit extends Command
      */
     public function handle()
     {
+        $this->abortCommandExecution();
         $this->info('Hello! Together we are going to config Acacha Laravel Forge publish ...');
         $this->info('');
         $this->info('Let me check the requirements...');
@@ -261,6 +263,24 @@ class PublishInit extends Command
         }
 
         $this->info("DONE!!!!!!!!!!!");
+    }
+
+    /**
+     * Abort command execution.
+     */
+    protected function abortCommandExecution()
+    {
+        $domain = env('ACACHA_FORGE_DOMAIN',null);
+        $ip = env('ACACHA_FORGE_IP_ADDRESS',null);
+
+        if ($domain != null && $ip != null ) {
+            $resolved_ip = gethostbyname ($domain);
+            if ( $resolved_ip != $domain && $resolved_ip == $ip ) {
+                return;
+            }
+        }
+
+        $this->checkForRootPermission();
     }
 
     /**

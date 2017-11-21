@@ -2,6 +2,7 @@
 
 namespace Acacha\ForgePublish\Commands;
 
+use Acacha\ForgePublish\Commands\Traits\ChecksForRootPermission;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -12,6 +13,12 @@ use Illuminate\Support\Facades\File;
  */
 class PublishDNS extends Command
 {
+
+    use ChecksForRootPermission;
+
+    /**
+     * Constant to /etc/hosts file
+     */
     const ETC_HOSTS = '/etc/hosts';
 
     /**
@@ -64,6 +71,8 @@ class PublishDNS extends Command
             $this->choice('Which system do you want to use?',['hosts'],0);
 
         if ($type != 'hosts') {
+            //TODO Support Other services OpenDNS/Hover.com? DNS service wiht API
+            // https://laracasts.com/series/server-management-with-forge/episodes/8
             $this->error('Type not supported');
             die();
         }
@@ -103,11 +112,7 @@ class PublishDNS extends Command
             die();
         }
 
-        if (posix_geteuid() != 0) {
-            $this->error('This command needs root permissions. Please use sudo: ');
-            $this->info('sudo php artisan publish:dns');
-            die();
-        }
+        $this->checkForRootPermission();
     }
 
 }
