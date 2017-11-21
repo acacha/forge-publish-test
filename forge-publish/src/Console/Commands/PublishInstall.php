@@ -56,7 +56,8 @@ class PublishInstall extends Command
 
         // TODO STEPS
         // 1) Install repository (api don't run composer install) in some cases better to avoid problems with studio/local packages
-        // 2) Enable quick deployment https://forge.laravel.com/api-documentation#deployment
+        // 2) Run composer install
+        // 3) optional Enable quick deployment https://forge.laravel.com/api-documentation#deployment
         // POST /api/v1/servers/{serverId}/sites/{siteId}/deployment
 
 
