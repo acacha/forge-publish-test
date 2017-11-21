@@ -2,7 +2,6 @@
 
 namespace Acacha\ForgePublish\Commands;
 
-use Acacha\ForgePublish\Parser\ForgePublishRCParser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
@@ -42,23 +41,6 @@ class PublishDNS extends Command
      * @var string
      */
     protected $ip;
-
-    /**
-     * ForgePublishRCParser
-     *
-     * @var ForgePublishRCParser
-     */
-    protected $parser;
-
-    /**
-     * Create a new command instance.
-     *
-     */
-    public function __construct(ForgePublishRCParser $parser)
-    {
-        parent::__construct();
-        $this->parser = $parser;
-    }
 
     /**
      * Execute the console command.
@@ -126,17 +108,6 @@ class PublishDNS extends Command
             $this->info('sudo php artisan publish:dns');
             die();
         }
-    }
-
-    /**
-     * Default Shell.
-     *
-     * @return string
-     */
-    protected function defaultShell()
-    {
-        if ($this->parser->getDefaultShell() == '') return 'bash';
-        return $this->parser->getDefaultShell();
     }
 
 }
