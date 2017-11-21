@@ -26,7 +26,7 @@ class PublishDNS extends Command
      *
      * @var string
      */
-    protected $signature = 'publish:dns {type?}';
+    protected $signature = 'publish:dns {ip?} {domain?} {type?}';
 
     /**
      * The console command description.
@@ -100,8 +100,8 @@ class PublishDNS extends Command
      */
     protected function abortCommandExecution()
     {
-        $this->domain = env('ACACHA_FORGE_DOMAIN',null);
-        $this->ip = env('ACACHA_FORGE_IP_ADDRESS',null);
+        $this->domain = $this->argument('domain') ? $this->argument('domain') : env('ACACHA_FORGE_DOMAIN',null);
+        $this->ip = $this->argument('ip') ? $this->argument('ip') : env('ACACHA_FORGE_IP_ADDRESS',null);
 
         if (env('ACACHA_FORGE_DOMAIN',null) == null ) {
             $this->error('No env var ACACHA_FORGE_DOMAIN found. Please run php artisan publish:init');

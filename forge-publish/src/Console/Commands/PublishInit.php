@@ -49,6 +49,13 @@ class PublishInit extends Command
     protected $parser;
 
     /**
+     * Is DNS already configured?
+     *
+     * @var Boolean
+     */
+    protected $dnsAlreadyConfigured = false;
+
+    /**
      * Create a new command instance.
      *
      */
@@ -250,11 +257,23 @@ class PublishInit extends Command
 
         }
 
+        if (! $this->dnsAlreadyConfigured ) {
+            $this->call('publish:dns',[
+                'ip' => $ip_address,
+                'domain' => $domain,
+            ]);
+        }
+
+        // TODO: SSH command encara no instal·la claus al servidor!!!
         $this->call('publish:ssh', [
             'email' => $email,
             'server_name' => $server_id,
             'ip' => $ip_address
         ]);
+
+//        dd('SHIT!');
+
+        $this->call('publish:dns');
 
         if ($this->confirm('Do you want to install your project to production?')) {
             $this->call('publish:install', [
@@ -276,6 +295,7 @@ class PublishInit extends Command
         if ($domain != null && $ip != null ) {
             $resolved_ip = gethostbyname ($domain);
             if ( $resolved_ip != $domain && $resolved_ip == $ip ) {
+                $this->dnsAlreadyConfigured = true;
                 return;
             }
         }
