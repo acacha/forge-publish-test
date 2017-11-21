@@ -19,7 +19,7 @@ class PublishRc extends Command
      *
      * @var string
      */
-    protected $signature = 'publish:rc {domain_suffix?}';
+    protected $signature = 'publish:rc {domain_suffix?} {ssh_shell?} ';
 
     /**
      * The console command description.
@@ -55,8 +55,13 @@ class PublishRc extends Command
             $this->argument('domain_suffix') :
             $this->ask('Default domain suffix?');
 
+        $ssh_shell = $this->argument('ssh_shell') ?
+            $this->argument('ssh_shell') :
+            $this->choice('Shell to use in SSH?',['bash','zsh'],0);
+
         $data = [
-            "ACACHA_FORGE_PUBLISH_DOMAIN_PREFIX" => $domain_suffix
+            "ACACHA_FORGE_PUBLISH_DOMAIN_PREFIX" => $domain_suffix,
+            "ACACHA_FORGE_PUBLISH_SSH_SHELL" => $ssh_shell,
         ];
 
         $content = $this->compiler->compile(

@@ -54,6 +54,13 @@ class PublishInstall extends Command
     {
         $this->info("I'm going to install this project to production...");
 
+        // TODO STEPS
+        // 1) Install repository (api don't run composer install) in some cases better to avoid problems with studio/local packages
+        // 2) Enable quick deployment https://forge.laravel.com/api-documentation#deployment
+        // POST /api/v1/servers/{serverId}/sites/{siteId}/deployment
+
+
+
 
 //        $site->installGitRepository(array $data);
 
@@ -62,7 +69,7 @@ class PublishInstall extends Command
 //          "provider": "github",
 //          "repository": "username/repository",
 //          "branch": "master"
-}
+//}
 
 
     }

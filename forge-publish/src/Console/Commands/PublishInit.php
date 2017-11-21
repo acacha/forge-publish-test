@@ -51,10 +51,10 @@ class PublishInit extends Command
      * Create a new command instance.
      *
      */
-    public function __construct(Client $htpp, ForgePublishRCParser $parser)
+    public function __construct(Client $http, ForgePublishRCParser $parser)
     {
         parent::__construct();
-        $this->http = $htpp;
+        $this->http = $http;
         $this->parser = $parser;
     }
 

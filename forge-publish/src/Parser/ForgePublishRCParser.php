@@ -45,13 +45,26 @@ class ForgePublishRCParser
     /**
      * Get domain suffix from config file.
      *
-     * @return array
+     * @return String
      */
     public function getDomainSuffix()
     {
         $rc_file = $this->parse();
         if ( array_key_exists('domain_suffix',$rc_file)) {
             return $rc_file['domain_suffix'];
+        }
+    }
+
+    /**
+     * Get default shell from config file.
+     *
+     * @return String
+     */
+    public function getDefaultShell()
+    {
+        $rc_file = $this->parse();
+        if ( array_key_exists('ssh_shell',$rc_file)) {
+            return $rc_file['ssh_shell'];
         }
     }
 
