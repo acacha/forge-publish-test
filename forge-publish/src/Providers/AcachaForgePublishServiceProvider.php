@@ -5,8 +5,10 @@ namespace Acacha\ForgePublish\Providers;
 use Acacha\ForgePublish\Commands\PublishCreateSite;
 use Acacha\ForgePublish\Commands\PublishDomain;
 use Acacha\ForgePublish\Commands\PublishEmail;
+use Acacha\ForgePublish\Commands\PublishGit;
 use Acacha\ForgePublish\Commands\PublishInfo;
 use Acacha\ForgePublish\Commands\PublishInit;
+use Acacha\ForgePublish\Commands\PublishInstall;
 use Acacha\ForgePublish\Commands\PublishIp;
 use Acacha\ForgePublish\Commands\PublishLogin;
 use Acacha\ForgePublish\Commands\PublishPush;
@@ -54,6 +56,8 @@ class AcachaForgePublishServiceProvider extends ServiceProvider
                 PublishCreateSite::class,
                 PublishSsh::class,
                 PublishRc::class,
+                PublishGit::class,
+                PublishInstall::class,
             ]);
         }
         

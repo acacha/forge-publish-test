@@ -43,30 +43,16 @@ class ForgePublishRCParser
     }
 
     /**
-     * Get credentials from config file.
+     * Get domain suffix from config file.
      *
      * @return array
      */
-    public function getCredentials()
+    public function getDomainSuffix()
     {
         $rc_file = $this->parse();
-        if ( array_key_exists('username',$rc_file) && array_key_exists('username',$rc_file)) {
-            return [$rc_file['username'],$rc_file['token']];
+        if ( array_key_exists('domain_suffix',$rc_file)) {
+            return $rc_file['domain_suffix'];
         }
     }
-
-    /**
-     * Get github username from config file.
-     *
-     * @return array
-     */
-    public function getGitHubUsername()
-    {
-        $rc_file = $this->parse();
-        if ( array_key_exists('username',$rc_file)) {
-            return $rc_file['username'];
-        }
-    }
-
 
 }

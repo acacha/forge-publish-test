@@ -36,7 +36,7 @@ class PublishRc extends Command
     protected $compiler;
 
     /**
-     * PublishRc constructor.
+     * Constructor.
      *
      */
     public function __construct(RCFileCompiler $compiler)
