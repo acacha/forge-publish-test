@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-echo 'Pre-deploy test!!'
+echo "###########PRE DEPLOY test!###############"
